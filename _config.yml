@@ -3,7 +3,7 @@
 #
 
 # Theme that I am using
-theme: minimal
+theme: jekyll-theme-minimal
 
 # Name of your site (displayed in the header)
 name: Alex Telon
