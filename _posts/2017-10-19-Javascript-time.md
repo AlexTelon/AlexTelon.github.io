@@ -1,3 +1,8 @@
+---
+layout: post
+title: Javascript date and the mythical year 0
+---
+
 Here is the story/rant of when I tried to use time in Javascript.
 
 > There are two hard things in computer science: cache invalidation, naming things, and off-by-one errors.
@@ -13,7 +18,7 @@ repository [wp2ghost](https://github.com/jonhoo/wp2ghost) which
 converts Wordpress XML exports to Ghost JSON import files. I had, as
 you might expect, previously written a blog in wordpress and wanted to
 export it to [ghost](https://ghost.org/). It so happened that there
-was an issue with the date fields for posts in my Wordpress XML export
+was an issue with the date fields for posts in my Wordpress XML expport
 so that wp2ghost gave all posts the *"date"* 0000-00-00 00:00:00
 instead. Luckily for me there was still a field with data information,
 it just was not the one wp2ghost was expecting so it was an issue I
