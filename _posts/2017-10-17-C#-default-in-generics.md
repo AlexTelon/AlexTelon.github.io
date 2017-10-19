@@ -20,7 +20,7 @@ and `bool`.
 
 Here is a very much simplified example of what I was working on and where my issue came to be.
 
-{% highlight csharp %}
+```csharp
 public class Node
 {
     public string Name;
@@ -43,13 +43,13 @@ public class Leaf<Type> : Node
         }
     }
 }
-{% endhighlight %}
+```
 
 With this code I my plan was to be able to create a Leaf like this:
 
 With a code like this my goal was to be able to handle the arguments like this:
 
-{% highlight csharp %}
+```csharp
 class Program
 {
 	class Location : Node
@@ -77,8 +77,8 @@ class Program
 		Console.WriteLine(Person.Height); // prints 184
 	}
 }
-{% endhighlight %}
-`
+```
+
 
 I created two Nodes, one for location and one for person and then
 there is methods that handle the parsing and converting from string to
@@ -87,23 +87,25 @@ any way compile right now.
 
 The problem is the following piece of code shown in the first listing:
 
-{% highlight csharp %}
+```csharp
     public Leaf(string name, bool isOptional = false, Type? defaultValue = null) : base(name)
-{% endhighlight %}
+```
 
 
-The issue here is Type? (shorthand for Nullable<T>). This is because Nullable<T> only works for value types. This can be seen in how Nullable<T> was implemented, some of that code is shown below:
+The issue here is `Type?` (shorthand for `Nullable<T>`). This is because
+`Nullable<T>` only works for value types. This can be seen in how
+`Nullable<T>` was implemented, some of that code is shown below:
 
-{% highlight csharp %}
+```csharp
 namespace System
 {
     public struct Nullable<T> where T : struct
     {
         public Nullable(T value);
-	...
+	//...
     }
 }
-{% endhighlight %}
+```
 
 
 `where T : struct` is an instance of what is called `generic
@@ -136,26 +138,30 @@ strings in my Leafs in certain situations. So I tried to solve it.
 ## How did I try to solve it at first?
 
 I imagined two classes:
-{% highlight csharp %}
+```
 class Leaf<T> where T : struct
 class Leaf<T> where T : string
-{% endhighlight %}
+```
 
 The idea was that I coulde use `Type? defaultValue = null` in one and
-`type defaultValue = null` in the other. But you cannot have two classes like that. I guess it is because the condition does not count as a part of the class definition the same way a name of <Type> does. Also even if it were possible having two classes with only this minor change is a lot of code duplication.
+`type defaultValue = null` in the other. But you cannot have two
+classes like that. I guess it is because the condition does not count
+as a part of the class definition the same way a name of <Type>
+does. Also even if it were possible having two classes with only this
+minor change is a lot of code duplication.
 
 Next I thought about just:
-{% highlight csharp %}
+```
 class Leaf<T> where T : struct
 class Leaf
-{% endhighlight %}
+```
 
 But that felt bad since it would be quite confusing for users of the library, see example below:
 
-{% highlight csharp %}
+```csharp
 Leaf<bool> FileName = new Leaf<bool>("enabled");
 Leaf FileName = new Leaf("fileName");
-{% endhighlight %}
+```
 
 Other leafs have their type clearly marked, but the string version is
 not which makes the code more difficult to understand. Also this would
@@ -163,7 +169,7 @@ again require having two almost identical sets of classes which is bad
 for maintainability.
 
 After some more thinking, some googling around and some thought about
-"why can't I have classes like Name<T> and Name<T> where T : struct in
+"why can't I have classes like `Name<T>` and `Name<T> where T : struct` in
 the same namespace". I figured this is the type of question one might
 ask on Stackoverflow because you would kinda feel smart while asking
 the question. So I started doing just that, feeling smart, and
@@ -182,13 +188,16 @@ lead me to find the solution in 1 minute!
 
 ### In the darkest hour.. a hero emerges!
 
-And here default comes to the rescue! Mind you been here for the rescue since C# 2, I just did now know about it!
+And here default comes to the rescue! Mind you been here for the
+rescue since C# 2, I just did now know about it!
 
-`default(T)` (or just `default` in certain cituaions since C#7.1) returns the default value for the type. 0 for *value types* and `null` for *reference types*.
+`default(T)` (or just `default` in certain cituaions since C#7.1)
+returns the default value for the type. 0 for *value types* and `null`
+for *reference types*.
 
 So for all this the solution was trivial, I just needed this:
 
-{% highlight csharp %}
+```csharp
 public class Leaf<Type> : Node
 {
     Type Value;
@@ -201,13 +210,13 @@ public class Leaf<Type> : Node
         }
     }
 }
-{% endhighlight %}
+```
 
 I did end up using `default(T)` instead since i does not require C#
 7.1. Student-Alex would have gone for `default` but now Im a
 PROFESSIONAL and that means being a bit more careful with stuff like
-that and since I have said "But it works on my computer" before when I
-upgraded to C# 7.0 a while back which caused minor issues for Visual
+that and since I have said *"But it works on my computer"* before when
+I upgraded to C# 7.0 a while back which caused minor issues for Visual
 Studio 2015 users. So upgrading to 7.1 to remove 3 chars feelt like a
 pretty bad ROI.
 
