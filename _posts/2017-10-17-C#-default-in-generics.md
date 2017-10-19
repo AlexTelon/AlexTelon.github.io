@@ -20,7 +20,7 @@ and `bool`.
 
 Here is a very much simplified example of what I was working on and where my issue came to be.
 
-~~~csharp
+{% highlight csharp %}
 public class Node
 {
     public string Name;
@@ -43,13 +43,14 @@ public class Leaf<Type> : Node
         }
     }
 }
-~~~
+{% endhighlight %}
+
 
 With this code I my plan was to be able to create a Leaf like this:
 
 With a code like this my goal was to be able to handle the arguments like this:
 
-~~~csharp
+{% highlight csharp %}
 class Program
 {
 	class Location : Node
@@ -77,7 +78,7 @@ class Program
 		Console.WriteLine(Person.Height); // prints 184
 	}
 }
-~~~
+{% endhighlight %}
 
 
 I created two Nodes, one for location and one for person and then
@@ -87,16 +88,15 @@ any way compile right now.
 
 The problem is the following piece of code shown in the first listing:
 
-~~~csharp
+{% highlight csharp %}
     public Leaf(string name, bool isOptional = false, Type? defaultValue = null) : base(name)
-~~~
-
+{% endhighlight %}
 
 The issue here is `Type?` (shorthand for `Nullable<T>`). This is because
 `Nullable<T>` only works for value types. This can be seen in how
 `Nullable<T>` was implemented, some of that code is shown below:
 
-~~~csharp
+{% highlight csharp %}
 namespace System
 {
     public struct Nullable<T> where T : struct
@@ -105,7 +105,7 @@ namespace System
 	//...
     }
 }
-~~~
+{% endhighlight %}
 
 
 `where T : struct` is an instance of what is called `generic
@@ -158,10 +158,10 @@ class Leaf
 
 But that felt bad since it would be quite confusing for users of the library, see example below:
 
-~~~csharp
+{% highlight csharp %}
 Leaf<bool> FileName = new Leaf<bool>("enabled");
 Leaf FileName = new Leaf("fileName");
-~~~
+{% endhighlight %}
 
 Other leafs have their type clearly marked, but the string version is
 not which makes the code more difficult to understand. Also this would
@@ -197,7 +197,7 @@ for *reference types*.
 
 So for all this the solution was trivial, I just needed this:
 
-~~~csharp
+{% highlight csharp %}
 public class Leaf<Type> : Node
 {
     Type Value;
@@ -210,7 +210,7 @@ public class Leaf<Type> : Node
         }
     }
 }
-~~~
+{% endhighlight %}
 
 I did end up using `default(T)` instead since i does not require C#
 7.1. Student-Alex would have gone for `default` but now Im a
