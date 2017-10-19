@@ -1,6 +1,6 @@
 ---
 layout: post
-title: C# default in Generics
+title: C# - default in Generics
 ---
 
 I was working on some code during work today and had a little issue. I
