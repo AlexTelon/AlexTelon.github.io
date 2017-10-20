@@ -1,6 +1,6 @@
 ---
 layout: post
-title: C&num; - default in Generics
+title: C&#35; - default in Generics
 ---
 
 I was working on some code during work today and had a little issue. I
@@ -138,10 +138,9 @@ strings in my Leafs in certain situations. So I tried to solve it.
 ## How did I try to solve it at first?
 
 I imagined two classes:
-~~~
-class Leaf<T> where T : struct
-class Leaf<T> where T : string
-~~~
+
+	class Leaf<T> where T : struct
+	class Leaf<T> where T : string
 
 The idea was that I coulde use `Type? defaultValue = null` in one and
 `type defaultValue = null` in the other. But you cannot have two
@@ -151,10 +150,10 @@ does. Also even if it were possible having two classes with only this
 minor change is a lot of code duplication.
 
 Next I thought about just:
-~~~
-class Leaf<T> where T : struct
-class Leaf
-~~~
+
+	class Leaf<T> where T : struct
+	class Leaf
+
 
 But that felt bad since it would be quite confusing for users of the library, see example below:
 

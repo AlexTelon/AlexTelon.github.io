@@ -39,8 +39,12 @@ After some chat about things I asked this:
 >I can add testcases when I get a greenlight on the code. Hopefully my second commit is better.
 >
 >Should I assume that the time is year 0 or should I maybe go for 1970?
+
 -me
+
+
 >The old code did not produce a sensible outcome in that case, so I think either is fine. 0000 is probably semantically more correct (1970 is just a UNIX timestamp artifact). The current change looks fine :)
+
 -he
 
 So I was just gonna do a quick change to my unit test, this will only
@@ -69,14 +73,14 @@ So somehow its apparently February the first now... So we have: `0000-02-01`.
 
 Though playing around with date to string functions gives me this:
 
-```
+~~~javascript
 date.toLocaleDateString()
 >"1-02-01" 
 date.toLocaleTimeString()
 >"00:12:12"
 date.toString()
 >"Tue Feb 01    0 00:00:00 GMT+0100 (W. Europe Standard Time)"
-```
+~~~
 
 So Im not sure if its year 0 or 1 right now and if the time is 12 minutes past midnight or not.
 
@@ -90,12 +94,12 @@ You can however, as a sidenote, write 0000-00-00 and get a date, as I did try a 
 
 Well knowing that the issue was that there is no year 0 Imma just put in a 1 there.
 
-```
+~~~javascript
 var date = new Date(1,1,1)
 date.setFullYear(0);
 date
 Tue Feb 01    0 00:00:00 GMT+0100 (W. Europe Standard Time)
-```
+~~~
 
 Notice Feb thing right there? Yeah, duno about that..
 
@@ -104,29 +108,29 @@ Ok so lets give date the longformat instead, where you even can specify the time
 
 But you can actually just skip the day of the week. which is great since you do not have to check that yourself! However I did check that in python and it says its a Monday, so Im not sure if I should care about this or not, Im hoping that I dont have to so I will just leave it at that!
 
-```
+~~~javascript
 >>> import time
 >>> import datetime
 >>> datetime.date(1,1,1)
 >>> datetime.date(1,1,1).ctime()
 '**Mon** Jan  1 00:00:00 000**1**'
-```
+~~~
 
 Anyways, we can use that longer format now:
 
-```
+~~~javascript
 var date = new Date("Sat Jan 01 0001 00:00:00 UTC");
 date.setFullYear(0);
-```
+~~~
 
 Again, even with the long form it messes up the year. You know like last time where it defaulted to 1901 when you gave it the year 01, but this time its to 2001(!). So it seems that 01 gives you 1901, but 0001 gives you 2001. just a FYI for anyone out there.
 
 Now to get the unix time we use [.getTime()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/getTime)
 
-```
+~~~javascript
 date.getTime()
 -62167219200000
-```
+~~~
 
 which returns you the number of milliseconds, so / 1000 and we should be done finally!
 
@@ -158,36 +162,36 @@ site implements its things in the backend.
 
 So while I agree that a magic number is not great I would suggest that we change the date to unixtime 0 instead and use:
 
-```
+~~~javascript
 var date = new Date(1970,01,01)
 date.getTime()
 > 2674800000
-```
+~~~
 
 Ok, obviously something is a bit off here..
 
-```
+~~~javascript
 date
 > Sun Feb 01 1970 00:00:00 GMT+0100 (W. Europe Standard Time)
-```
+~~~
 
 Ok, so why is it Febuary again? As it turns out, when giving time in full javascript format or whatever then the months range from 01-12. **But**, and this is the fun part, when giving the numbers in any other way its range is 0-11. This *of course* makes sense since we are programmers and count from 0, not from 1 like those simpleminded people on the streets!
 
 So lets do that last part again! And I kid you not, I assumed at this point that days would work the same way as months in this format, starting from 0. But NO it is 1-31! So months from 0-11 and days from 1-31. Again this makes sense since we are programmers we count from 0 besides when it would be confusing! **asdasdaslfjhsg!**
 
-```
+~~~javascript
 var date = new Date(1970,00,01)
 date.getTime() / 1000 // lets convert to seconds.
 > -3600
-```
+~~~
 
 and now we just have my GMT+1 error left. So lets use the longform then.
 
-```
+~~~javascript
 var date = new Date("1970-01-01 00:00:00 UTC") 
 date.getTime() / 1000
 > 0
-```
+~~~
 
 So, finally! My suggestion is then let us change the default fallback day to unix time 0.  I will replace the other magic number with the corresponding new Date("year-in-longform").getTime / 1000. 
 
