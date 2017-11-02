@@ -86,5 +86,5 @@ exclude:
   - CNAME
 
 # Theme that I am using
-theme: jekyll-theme-minimal
+theme: jekyll-theme-tactile
 
